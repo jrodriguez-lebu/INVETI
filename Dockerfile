@@ -7,7 +7,8 @@ RUN composer install \
     --no-interaction \
     --no-scripts \
     --prefer-dist \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --ignore-platform-reqs
 
 # ── Etapa 2: imagen final ────────────────────────────────────────────────────
 FROM php:8.4-fpm-alpine
