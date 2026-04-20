@@ -10,7 +10,7 @@ RUN composer install \
     --optimize-autoloader
 
 # ── Etapa 2: imagen final ────────────────────────────────────────────────────
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 LABEL maintainer="Municipalidad de Lebu"
 LABEL app="INVETI"
