@@ -20,6 +20,7 @@ LABEL app="INVETI"
 RUN apk add --no-cache \
     nginx \
     supervisor \
+    bash \
     curl \
     zip \
     unzip \
