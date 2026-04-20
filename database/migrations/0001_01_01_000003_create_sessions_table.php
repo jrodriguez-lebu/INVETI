@@ -2,24 +2,28 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        if (Schema::hasTable('sessions')) {
-            return;
-        }
-
-        Schema::create('sessions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
-        });
+        // Usamos IF NOT EXISTS para evitar error si la tabla ya existe
+        // (puede ocurrir si un deploy anterior la creó sin registrar la migración)
+        DB::statement("
+            CREATE TABLE IF NOT EXISTS `sessions` (
+                `id` varchar(255) NOT NULL,
+                `user_id` bigint unsigned DEFAULT NULL,
+                `ip_address` varchar(45) DEFAULT NULL,
+                `user_agent` text,
+                `payload` longtext NOT NULL,
+                `last_activity` int NOT NULL,
+                PRIMARY KEY (`id`),
+                KEY `sessions_user_id_index` (`user_id`),
+                KEY `sessions_last_activity_index` (`last_activity`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
     }
 
     public function down(): void
