@@ -113,7 +113,7 @@ class EquipoController extends Controller
     public function create()
     {
         $tipos        = TipoEquipo::orderBy('nombre')->get();
-        $funcionarios = Funcionario::where('activo', true)->orderBy('apellido')->orderBy('nombre')->get();
+        $funcionarios = Funcionario::where('activo', true)->orderBy('nombre')->orderBy('apellido')->get();
         $departamentos = Departamento::orderBy('nombre')->get();
         return view('equipos.create', compact('tipos', 'funcionarios', 'departamentos'));
     }
@@ -197,7 +197,7 @@ class EquipoController extends Controller
     public function edit(Equipo $equipo)
     {
         $tipos        = TipoEquipo::orderBy('nombre')->get();
-        $funcionarios = Funcionario::where('activo', true)->orderBy('apellido')->orderBy('nombre')->get();
+        $funcionarios = Funcionario::where('activo', true)->orderBy('nombre')->orderBy('apellido')->get();
         $departamentos = Departamento::orderBy('nombre')->get();
         return view('equipos.edit', compact('equipo', 'tipos', 'funcionarios', 'departamentos'));
     }
