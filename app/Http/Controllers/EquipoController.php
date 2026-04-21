@@ -190,7 +190,7 @@ class EquipoController extends Controller
 
     public function show(Equipo $equipo)
     {
-        $equipo->load(['tipoEquipo', 'funcionario.departamento', 'departamento', 'actasEntrega.funcionario']);
+        $equipo->load(['tipoEquipo', 'funcionario.departamento', 'departamento', 'actasEntrega.funcionario', 'historial']);
         return view('equipos.show', compact('equipo'));
     }
 

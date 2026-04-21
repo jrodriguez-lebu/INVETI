@@ -257,6 +257,77 @@
         @endif
     </div>
 
+    {{-- ── Historial de cambios ──────────────────────────────────────────────── --}}
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="px-6 py-4 border-b border-gray-100 flex items-center space-x-2">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 class="text-sm font-semibold text-gray-700">Historial de Cambios</h3>
+            <span class="ml-auto text-xs text-gray-400">{{ $equipo->historial->count() }} registro(s)</span>
+        </div>
+
+        @if($equipo->historial->count())
+            <div class="divide-y divide-gray-50">
+                @foreach($equipo->historial as $registro)
+                <div class="px-6 py-3 flex items-start space-x-4">
+
+                    {{-- Ícono según campo --}}
+                    <div class="flex-shrink-0 mt-0.5">
+                        @if($registro->campo === 'funcionario')
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-blue-100">
+                                <svg class="w-3.5 h-3.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                </svg>
+                            </span>
+                        @elseif($registro->campo === 'estado')
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-yellow-100">
+                                <svg class="w-3.5 h-3.5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                            </span>
+                        @else
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-purple-100">
+                                <svg class="w-3.5 h-3.5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                </svg>
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Detalle --}}
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-800">
+                            <span class="font-medium">{{ $registro->campo_label }}</span> cambió de
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-700 line-through">
+                                {{ $registro->valor_anterior ?? 'Sin asignar' }}
+                            </span>
+                            a
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700">
+                                {{ $registro->valor_nuevo ?? 'Sin asignar' }}
+                            </span>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-0.5">
+                            {{ $registro->created_at->format('d/m/Y H:i') }}
+                            @if($registro->user_nombre)
+                                — por <span class="font-medium text-gray-500">{{ $registro->user_nombre }}</span>
+                            @endif
+                        </p>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @else
+            <div class="px-6 py-8 text-center text-sm text-gray-400">
+                <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Sin cambios registrados aún.
+            </div>
+        @endif
+    </div>
+
 </div>
 
 @endsection

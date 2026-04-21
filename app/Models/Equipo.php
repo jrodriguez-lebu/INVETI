@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Equipo extends Model
 {
@@ -44,15 +45,68 @@ class Equipo extends Model
         'campos_faltantes'   => 'array',
     ];
 
+    // Campos que se auditan para trazabilidad
+    protected const CAMPOS_AUDITADOS = ['funcionario_id', 'estado', 'departamento_id'];
+
     protected static function boot(): void
     {
         parent::boot();
 
+        // Recalcular incompletos antes de guardar
         static::saving(function (Equipo $equipo) {
             $missing = $equipo->incompleteFields();
             $equipo->datos_incompletos = count($missing) > 0;
             $equipo->campos_faltantes  = $missing;
         });
+
+        // Registrar historial de cambios después de actualizar
+        static::updated(function (Equipo $equipo) {
+            $changes  = $equipo->getChanges();
+            $original = $equipo->getOriginal();
+            $user     = Auth::user();
+
+            foreach (self::CAMPOS_AUDITADOS as $campo) {
+                if (!array_key_exists($campo, $changes)) continue;
+
+                $anterior = $original[$campo] ?? null;
+                $nuevo    = $changes[$campo] ?? null;
+
+                if ($anterior === $nuevo) continue;
+
+                EquipoHistorial::create([
+                    'equipo_id'      => $equipo->id,
+                    'campo'          => match($campo) {
+                        'funcionario_id'  => 'funcionario',
+                        'estado'          => 'estado',
+                        'departamento_id' => 'departamento',
+                    },
+                    'valor_anterior' => $equipo->resolverValor($campo, $anterior),
+                    'valor_nuevo'    => $equipo->resolverValor($campo, $nuevo),
+                    'user_id'        => $user?->id,
+                    'user_nombre'    => $user?->name,
+                ]);
+            }
+        });
+    }
+
+    /**
+     * Convierte un ID o valor crudo en texto legible para el historial.
+     */
+    public function resolverValor(string $campo, mixed $valor): ?string
+    {
+        if ($valor === null) return null;
+
+        return match($campo) {
+            'funcionario_id'  => Funcionario::find($valor)?->nombre_completo ?? "ID: $valor",
+            'departamento_id' => Departamento::find($valor)?->nombre ?? "ID: $valor",
+            'estado'          => match($valor) {
+                'activo'   => 'Activo',
+                'inactivo' => 'Inactivo',
+                'baja'     => 'Dado de Baja',
+                default    => $valor,
+            },
+            default => (string) $valor,
+        };
     }
 
     public function tipoEquipo(): BelongsTo
@@ -73,6 +127,11 @@ class Equipo extends Model
     public function actasEntrega(): HasMany
     {
         return $this->hasMany(ActaEntrega::class);
+    }
+
+    public function historial(): HasMany
+    {
+        return $this->hasMany(EquipoHistorial::class)->orderByDesc('created_at');
     }
 
     public function getEstadoBadgeAttribute(): string
