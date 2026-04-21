@@ -22,20 +22,26 @@ class TipoEquipo extends Model
 
     public function getIconoHtmlAttribute(): string
     {
+        // Si el campo icono ya contiene un emoji (carácter Unicode > 255), usarlo directamente
+        if ($this->icono && mb_strlen($this->icono) >= 1 && ord($this->icono[0]) > 127) {
+            return $this->icono;
+        }
+
+        // Fallback: mapa por nombre para tipos existentes
         $iconos = [
-            'AIO' => '🖥️',
-            'Notebook' => '💻',
-            'Impresora' => '🖨️',
+            'AIO'          => '🖥️',
+            'Notebook'     => '💻',
+            'Impresora'    => '🖨️',
             'Multifuncional' => '🖨️',
-            'Smartphone' => '📱',
-            'Monitor' => '🖥️',
-            'UPS' => '🔋',
-            'Switch' => '🔌',
-            'Router' => '📡',
-            'Proyector' => '📽️',
-            'Servidor' => '🖥️',
-            'Tablet' => '📱',
-            'Otro' => '💾',
+            'Smartphone'   => '📱',
+            'Monitor'      => '📺',
+            'UPS'          => '🔋',
+            'Switch'       => '🔌',
+            'Router'       => '📡',
+            'Proyector'    => '📽️',
+            'Servidor'     => '🗄️',
+            'Tablet'       => '📱',
+            'Otro'         => '💾',
         ];
 
         return $iconos[$this->nombre] ?? '💾';
