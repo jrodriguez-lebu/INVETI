@@ -44,6 +44,17 @@ class Equipo extends Model
         'campos_faltantes'   => 'array',
     ];
 
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::saving(function (Equipo $equipo) {
+            $missing = $equipo->incompleteFields();
+            $equipo->datos_incompletos = count($missing) > 0;
+            $equipo->campos_faltantes  = $missing;
+        });
+    }
+
     public function tipoEquipo(): BelongsTo
     {
         return $this->belongsTo(TipoEquipo::class, 'tipo_equipo_id');
