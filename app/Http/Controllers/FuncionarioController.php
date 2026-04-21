@@ -53,7 +53,6 @@ class FuncionarioController extends Controller
             'departamento_id' => 'required|exists:departamentos,id',
             'email'           => 'nullable|email|max:150',
             'telefono'        => 'nullable|string|max:20',
-            'activo'          => 'boolean',
         ]);
 
         $validated['activo'] = $request->has('activo');
@@ -86,7 +85,6 @@ class FuncionarioController extends Controller
             'departamento_id' => 'required|exists:departamentos,id',
             'email'           => 'nullable|email|max:150',
             'telefono'        => 'nullable|string|max:20',
-            'activo'          => 'boolean',
         ]);
 
         $validated['activo'] = $request->has('activo');
