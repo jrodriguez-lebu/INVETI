@@ -14,7 +14,7 @@
             </div>
             <div>
                 <h2 class="text-base font-semibold text-gray-800">Crear Nuevo Usuario</h2>
-                <p class="text-xs text-gray-500">Se enviará un correo de verificación al email indicado.</p>
+                <p class="text-xs text-gray-500">El usuario recibirá un correo para activar su cuenta y crear su contraseña.</p>
             </div>
         </div>
 
@@ -41,31 +41,15 @@
                 @error('email')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
             </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    Contraseña <span class="text-red-500">*</span>
-                </label>
-                <input type="password" name="password" required
-                       placeholder="Mínimo 8 caracteres con letras y números"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 {{ $errors->has('password') ? 'border-red-400' : '' }}">
-                @error('password')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5">
-                    Confirmar contraseña <span class="text-red-500">*</span>
-                </label>
-                <input type="password" name="password_confirmation" required
-                       placeholder="Repita la contraseña"
-                       class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500">
-            </div>
-
-            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 flex gap-2 text-xs text-amber-800">
-                <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex gap-3 text-xs text-blue-800">
+                <svg class="w-5 h-5 flex-shrink-0 mt-0.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
-                <span>Se enviará un <strong>correo de verificación</strong> a la dirección indicada. El usuario deberá hacer clic en el enlace para activar su cuenta.</span>
+                <div>
+                    <p class="font-semibold mb-0.5">Se enviará un correo de activación</p>
+                    <p>El usuario recibirá un enlace para crear su propia contraseña y activar su cuenta. El enlace expira en 60 minutos.</p>
+                </div>
             </div>
 
             <div class="flex items-center justify-between pt-2 border-t border-gray-100">
