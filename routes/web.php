@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ActivarCuentaController;
+use App\Http\Controllers\DireccionController;
 use App\Http\Controllers\RecuperarContrasenaController;
 use App\Http\Controllers\ActaEntregaController;
 use App\Http\Controllers\AuthController;
@@ -51,6 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('equipos', EquipoController::class);
     Route::resource('funcionarios', FuncionarioController::class);
+    Route::resource('direcciones', DireccionController::class)->except(['show']);
     Route::resource('departamentos', DepartamentoController::class)->except(['show']);
     Route::resource('tipos-equipo', TipoEquipoController::class)->except(['show']);
     Route::resource('actas', ActaEntregaController::class);

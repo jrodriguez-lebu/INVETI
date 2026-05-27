@@ -25,6 +25,7 @@
             <thead>
                 <tr class="bg-gray-50 text-left">
                     <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dirección</th>
                     <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Descripción</th>
                     <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Funcionarios</th>
                     <th class="px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Equipos</th>
@@ -44,6 +45,15 @@
                                 </div>
                                 <span class="font-medium text-gray-800">{{ $dep->nombre }}</span>
                             </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            @if($dep->direccion)
+                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                    {{ $dep->direccion->nombre }}
+                                </span>
+                            @else
+                                <span class="text-gray-400 text-xs">—</span>
+                            @endif
                         </td>
                         <td class="px-4 py-3 text-gray-500 text-sm">{{ $dep->descripcion ?? '-' }}</td>
                         <td class="px-4 py-3 text-center">
@@ -84,7 +94,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-12 text-center text-gray-500 text-sm">No hay departamentos registrados.</td>
+                        <td colspan="6" class="px-4 py-12 text-center text-gray-500 text-sm">No hay departamentos registrados.</td>
                     </tr>
                 @endforelse
             </tbody>

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departamento;
+use App\Models\Direccion;
 use Illuminate\Http\Request;
 
 class DepartamentoController extends Controller
@@ -10,6 +11,7 @@ class DepartamentoController extends Controller
     public function index()
     {
         $departamentos = Departamento::withCount(['funcionarios', 'equipos'])
+            ->with('direccion')
             ->orderBy('nombre')
             ->get();
         return view('departamentos.index', compact('departamentos'));
@@ -17,14 +19,16 @@ class DepartamentoController extends Controller
 
     public function create()
     {
-        return view('departamentos.create');
+        $direcciones = Direccion::orderBy('nombre')->get();
+        return view('departamentos.create', compact('direcciones'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre'      => 'required|string|max:150|unique:departamentos,nombre',
-            'descripcion' => 'nullable|string',
+            'direccion_id' => 'nullable|exists:direcciones,id',
+            'nombre'       => 'required|string|max:150|unique:departamentos,nombre',
+            'descripcion'  => 'nullable|string',
         ]);
 
         Departamento::create($validated);
@@ -35,14 +39,16 @@ class DepartamentoController extends Controller
 
     public function edit(Departamento $departamento)
     {
-        return view('departamentos.edit', compact('departamento'));
+        $direcciones = Direccion::orderBy('nombre')->get();
+        return view('departamentos.edit', compact('departamento', 'direcciones'));
     }
 
     public function update(Request $request, Departamento $departamento)
     {
         $validated = $request->validate([
-            'nombre'      => 'required|string|max:150|unique:departamentos,nombre,' . $departamento->id,
-            'descripcion' => 'nullable|string',
+            'direccion_id' => 'nullable|exists:direcciones,id',
+            'nombre'       => 'required|string|max:150|unique:departamentos,nombre,' . $departamento->id,
+            'descripcion'  => 'nullable|string',
         ]);
 
         $departamento->update($validated);

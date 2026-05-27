@@ -13,6 +13,19 @@
             @csrf @method('PUT')
             <div class="p-6 space-y-4">
                 <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Dirección</label>
+                    <select name="direccion_id"
+                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 bg-white">
+                        <option value="">— Sin dirección asignada —</option>
+                        @foreach($direcciones as $dir)
+                            <option value="{{ $dir->id }}"
+                                {{ old('direccion_id', $departamento->direccion_id) == $dir->id ? 'selected' : '' }}>
+                                {{ $dir->nombre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nombre <span class="text-red-500">*</span></label>
                     <input type="text" name="nombre" value="{{ old('nombre', $departamento->nombre) }}" required
                            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500">
