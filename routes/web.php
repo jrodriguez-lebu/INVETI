@@ -65,6 +65,7 @@ Route::middleware('auth')->group(function () {
 
     // API helpers internos
     Route::get('/api/next-inventario', [EquipoController::class, 'nextInventario'])->name('api.next-inventario');
-    Route::post('/api/funcionarios/quick-store', [FuncionarioController::class, 'quickStore'])->name('api.funcionarios.quick-store');
+    Route::post('/api/funcionarios/quick-store',  [FuncionarioController::class,  'quickStore'])->name('api.funcionarios.quick-store');
+    Route::post('/api/departamentos/quick-store', [DepartamentoController::class, 'quickStore'])->name('api.departamentos.quick-store');
 
 });

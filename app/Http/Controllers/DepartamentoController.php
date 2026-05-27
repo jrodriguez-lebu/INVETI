@@ -57,6 +57,31 @@ class DepartamentoController extends Controller
             ->with('success', 'Departamento actualizado correctamente.');
     }
 
+    /**
+     * Creación rápida de departamento desde modal (AJAX).
+     */
+    public function quickStore(Request $request)
+    {
+        $validated = $request->validate([
+            'nombre'       => 'required|string|max:150|unique:departamentos,nombre',
+            'direccion_id' => 'nullable|exists:direcciones,id',
+        ], [
+            'nombre.required' => 'El nombre del departamento es obligatorio.',
+            'nombre.unique'   => 'Ya existe un departamento con ese nombre.',
+        ]);
+
+        $dep = Departamento::create($validated);
+        $dep->load('direccion');
+
+        return response()->json([
+            'id'          => $dep->id,
+            'nombre'      => $dep->nombre,
+            'direccion_id'=> $dep->direccion_id,
+            'direccion'   => $dep->direccion?->nombre,
+            'label'       => $dep->nombre . ($dep->direccion ? ' — ' . $dep->direccion->nombre : ''),
+        ]);
+    }
+
     public function destroy(Departamento $departamento)
     {
         if ($departamento->funcionarios()->count() > 0 || $departamento->equipos()->count() > 0) {

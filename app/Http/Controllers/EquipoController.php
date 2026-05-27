@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departamento;
+use App\Models\Direccion;
 use App\Models\Equipo;
 use App\Models\Funcionario;
 use App\Models\TipoEquipo;
@@ -19,23 +20,28 @@ class EquipoController extends Controller
     public function nextInventario(Request $request)
     {
         $count = max(1, min(20, (int) $request->get('count', 1)));
+        $year  = now()->year;
 
-        // Buscar el mayor número existente en formato INV-NNNN
-        $last = Equipo::where('numero_inventario', 'like', 'INV-%')
+        // Buscar el mayor número secuencial existente en formato INV-NNNN-YYYY
+        $last = Equipo::where('numero_inventario', 'like', 'INV-%-' . $year)
             ->get()
-            ->filter(fn($e) => preg_match('/^INV-(\d+)$/', $e->numero_inventario))
-            ->map(fn($e) => (int) substr($e->numero_inventario, 4))
+            ->filter(fn($e) => preg_match('/^INV-(\d+)-\d{4}$/', $e->numero_inventario, $m) && $m)
+            ->map(function ($e) {
+                preg_match('/^INV-(\d+)-\d{4}$/', $e->numero_inventario, $m);
+                return (int) $m[1];
+            })
             ->max() ?? 0;
 
         $numbers = [];
-        $next = $last + 1;
+        $next    = $last + 1;
 
         for ($i = 0; $i < $count; $i++) {
-            // Saltar si ya existe (por si acaso hay huecos con otros formatos)
-            while (Equipo::where('numero_inventario', 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT))->exists()) {
+            $candidate = 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT) . '-' . $year;
+            while (Equipo::where('numero_inventario', $candidate)->exists()) {
                 $next++;
+                $candidate = 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT) . '-' . $year;
             }
-            $numbers[] = 'INV-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+            $numbers[] = $candidate;
             $next++;
         }
 
@@ -112,10 +118,11 @@ class EquipoController extends Controller
 
     public function create()
     {
-        $tipos        = TipoEquipo::orderBy('nombre')->get();
-        $funcionarios = Funcionario::where('activo', true)->orderBy('nombre')->orderBy('apellido')->get();
+        $tipos         = TipoEquipo::orderBy('nombre')->get();
+        $funcionarios  = Funcionario::where('activo', true)->orderBy('nombre')->orderBy('apellido')->get();
+        $direcciones   = Direccion::with(['departamentos' => fn($q) => $q->orderBy('nombre')])->orderBy('nombre')->get();
         $departamentos = Departamento::orderBy('nombre')->get();
-        return view('equipos.create', compact('tipos', 'funcionarios', 'departamentos'));
+        return view('equipos.create', compact('tipos', 'funcionarios', 'direcciones', 'departamentos'));
     }
 
     public function store(Request $request)
