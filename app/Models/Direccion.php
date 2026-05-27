@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Direccion extends Model
 {
+    protected $table = 'direcciones';
+
     protected $fillable = [
         'nombre',
         'descripcion',

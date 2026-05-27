@@ -52,7 +52,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('equipos', EquipoController::class);
     Route::resource('funcionarios', FuncionarioController::class);
-    Route::resource('direcciones', DireccionController::class)->except(['show']);
+    Route::resource('direcciones', DireccionController::class)->except(['show'])->parameters(['direcciones' => 'direccion']);
     Route::resource('departamentos', DepartamentoController::class)->except(['show']);
     Route::resource('tipos-equipo', TipoEquipoController::class)->except(['show']);
     Route::resource('actas', ActaEntregaController::class);
