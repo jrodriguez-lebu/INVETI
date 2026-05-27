@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión — INVETI</title>
+    <title>Restablecer Contraseña — INVETI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -45,39 +45,31 @@
             <p class="text-municipal-400 text-xs mt-0.5">Ilustre Municipalidad de Lebu</p>
         </div>
 
-        {{-- Card de login --}}
+        {{-- Card --}}
         <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
 
             <div class="bg-municipal-800 px-6 py-4">
-                <h2 class="text-white font-semibold text-base">Acceso al Sistema</h2>
-                <p class="text-municipal-300 text-xs mt-0.5">Ingrese sus credenciales de administrador</p>
+                <h2 class="text-white font-semibold text-base">Crear nueva contraseña</h2>
+                <p class="text-municipal-300 text-xs mt-0.5">Elige una contraseña segura para tu cuenta</p>
             </div>
 
-            <form method="POST" action="{{ route('login') }}" class="p-6 space-y-5">
+            <form method="POST" action="{{ route('password.update') }}" class="p-6 space-y-5">
                 @csrf
 
-                {{-- Éxito (ej: contraseña restablecida) --}}
-                @if (session('success'))
-                    <div class="flex items-start space-x-3 p-3.5 bg-green-50 border border-green-200 rounded-xl">
-                        <svg class="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        <p class="text-sm text-green-700 font-medium">{{ session('success') }}</p>
-                    </div>
-                @endif
+                <input type="hidden" name="token" value="{{ $token }}">
 
                 {{-- Error global --}}
-                @if($errors->any())
+                @if ($errors->any())
                     <div class="flex items-start space-x-3 p-3.5 bg-red-50 border border-red-200 rounded-xl">
                         <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <p class="text-sm text-red-700 font-medium">{{ $errors->first('email') }}</p>
+                        <p class="text-sm text-red-700 font-medium">{{ $errors->first() }}</p>
                     </div>
                 @endif
 
-                {{-- Email --}}
+                {{-- Email (oculto visualmente pero requerido por el broker) --}}
                 <div class="space-y-1.5">
                     <label for="email" class="block text-sm font-medium text-gray-700">
                         Correo electrónico
@@ -90,18 +82,16 @@
                             </svg>
                         </div>
                         <input id="email" type="email" name="email"
-                               value="{{ old('email') }}"
-                               required autofocus autocomplete="email"
-                               placeholder="admin@municipalidadlebu.cl"
-                               class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 focus:border-transparent transition
-                                      {{ $errors->has('email') ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white' }}">
+                               value="{{ old('email', $email ?? '') }}"
+                               required readonly autocomplete="email"
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-gray-50 text-gray-500 cursor-not-allowed">
                     </div>
                 </div>
 
-                {{-- Contraseña --}}
+                {{-- Nueva contraseña --}}
                 <div class="space-y-1.5">
                     <label for="password" class="block text-sm font-medium text-gray-700">
-                        Contraseña
+                        Nueva contraseña
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -111,25 +101,31 @@
                             </svg>
                         </div>
                         <input id="password" type="password" name="password"
-                               required autocomplete="current-password"
-                               placeholder="••••••••"
-                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 focus:border-transparent transition bg-white">
+                               required autocomplete="new-password"
+                               placeholder="Mínimo 8 caracteres con letras y números"
+                               class="w-full pl-10 pr-4 py-2.5 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 focus:border-transparent transition
+                                      {{ $errors->has('password') ? 'border-red-400 bg-red-50' : 'border-gray-300 bg-white' }}">
                     </div>
+                    <p class="text-xs text-gray-400">Mínimo 8 caracteres, debe incluir letras y números.</p>
                 </div>
 
-                {{-- Recordar sesión + recuperar contraseña --}}
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <input id="remember" type="checkbox" name="remember"
-                               class="w-4 h-4 text-municipal-600 border-gray-300 rounded focus:ring-municipal-500">
-                        <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer">
-                            Mantener sesión iniciada
-                        </label>
+                {{-- Confirmar contraseña --}}
+                <div class="space-y-1.5">
+                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700">
+                        Confirmar contraseña
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <input id="password_confirmation" type="password" name="password_confirmation"
+                               required autocomplete="new-password"
+                               placeholder="Repite la contraseña"
+                               class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 focus:border-transparent transition bg-white">
                     </div>
-                    <a href="{{ route('password.request') }}"
-                       class="text-sm text-municipal-700 hover:text-municipal-900 font-medium transition-colors">
-                        ¿Olvidaste tu contraseña?
-                    </a>
                 </div>
 
                 {{-- Botón --}}
@@ -137,18 +133,12 @@
                         class="w-full bg-municipal-700 hover:bg-municipal-800 text-white font-semibold py-2.5 px-4 rounded-xl transition-colors duration-200 flex items-center justify-center space-x-2 shadow-sm">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                              d="M5 13l4 4L19 7"/>
                     </svg>
-                    <span>Ingresar al Sistema</span>
+                    <span>Guardar nueva contraseña</span>
                 </button>
 
             </form>
-
-            <div class="px-6 py-3 bg-gray-50 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-400">
-                    Acceso restringido a personal autorizado
-                </p>
-            </div>
         </div>
 
         <p class="text-center text-municipal-400 text-xs mt-6">
