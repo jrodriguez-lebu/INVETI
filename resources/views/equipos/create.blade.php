@@ -191,6 +191,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo de Equipo <span class="text-red-500">*</span></label>
                         <select name="tipo_equipo_id" required
+                                @change="detectarComputador($event.target.value)"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500 {{ $errors->has('tipo_equipo_id') ? 'border-red-400' : '' }}">
                             <option value="">Seleccione un tipo</option>
                             @foreach($tipos as $tipo)
@@ -304,6 +305,9 @@
                         <p class="mt-1 text-xs text-gray-400">¿No aparece? Haz clic en <strong>+</strong> para agregar.</p>
                     </div>
                 </div>
+
+                {{-- ── Especificaciones de Hardware (solo computadores) ── --}}
+                @include('equipos._specs_hardware')
 
                 {{-- Datos de Adquisición / Proveedor --}}
                 <div class="border-t border-gray-100 pt-5">
@@ -507,6 +511,10 @@ function equipoForm() {
         items:      [{ numero_inventario: '', numero_serie: '' }],
         loadingNums: false,
 
+        // Tipos con computador flag
+        tiposComputador: @json($tipos->map(fn($t) => ['id' => $t->id, 'nombre' => strtolower($t->nombre)])),
+        esComputador: false,
+
         // Dirección → Departamento
         selectedDireccion: '',
 
@@ -526,6 +534,20 @@ function equipoForm() {
             await this.cargarNumeros(1).then(nums => {
                 if (nums[0]) this.items[0].numero_inventario = nums[0];
             });
+            // Detectar si hay un tipo pre-seleccionado (old input tras error)
+            const sel = document.querySelector('select[name="tipo_equipo_id"]');
+            if (sel && sel.value) this.detectarComputador(sel.value);
+        },
+
+        // Palabras clave que indican que el equipo tiene specs de hardware
+        TIPOS_COMPUTADOR: ['aio', 'notebook', 'servidor', 'tablet', 'computador', 'desktop', 'pc'],
+
+        detectarComputador(tipoId) {
+            if (!tipoId) { this.esComputador = false; return; }
+            const tipo = this.tiposComputador.find(t => t.id == tipoId);
+            this.esComputador = tipo
+                ? this.TIPOS_COMPUTADOR.some(kw => tipo.nombre.includes(kw))
+                : false;
         },
 
         async cargarNumeros(count) {

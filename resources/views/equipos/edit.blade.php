@@ -5,7 +5,9 @@
 
 @section('content')
 
-<div class="max-w-4xl">
+<div class="max-w-4xl"
+     x-data="editEquipoForm()"
+     x-init="init()">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <div class="px-6 py-4 border-b border-gray-100">
             <div class="flex items-center justify-between">
@@ -33,6 +35,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Tipo de Equipo <span class="text-red-500">*</span></label>
                         <select name="tipo_equipo_id" required
+                                @change="detectarComputador($event.target.value)"
                                 class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-municipal-500">
                             <option value="">Seleccione un tipo</option>
                             @foreach($tipos as $tipo)
@@ -117,6 +120,8 @@
                     </div>
                 </div>
 
+                @include('equipos._specs_hardware', ['equipo' => $equipo])
+
                 {{-- Datos de Adquisición / Proveedor --}}
                 <div class="border-t border-gray-100 pt-5">
                     <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Datos de Adquisición y Proveedor</p>
@@ -182,3 +187,32 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+function editEquipoForm() {
+    return {
+        esComputador: false,
+
+        TIPOS_COMPUTADOR: ['aio', 'notebook', 'servidor', 'tablet', 'computador', 'desktop', 'pc'],
+
+        tiposData: @json($tipos->map(fn($t) => ['id' => $t->id, 'nombre' => $t->nombre])),
+
+        init() {
+            const tipoSelect = this.$el.querySelector('[name="tipo_equipo_id"]');
+            if (tipoSelect && tipoSelect.value) {
+                this.detectarComputador(tipoSelect.value);
+            }
+        },
+
+        detectarComputador(tipoId) {
+            if (!tipoId) { this.esComputador = false; return; }
+            const tipo = this.tiposData.find(t => String(t.id) === String(tipoId));
+            if (!tipo) { this.esComputador = false; return; }
+            const nombre = tipo.nombre.toLowerCase();
+            this.esComputador = this.TIPOS_COMPUTADOR.some(k => nombre.includes(k));
+        },
+    };
+}
+</script>
+@endpush

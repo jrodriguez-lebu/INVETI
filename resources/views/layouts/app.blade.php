@@ -316,5 +316,6 @@
 
     </div>{{-- /wrapper flex principal --}}
 
+@stack('scripts')
 </body>
 </html>
